@@ -13,7 +13,7 @@ protocols:
 * Panasonic (no)
 * Own (no)
 
-Verified under the ATS atmegaXX8PA
+Verified under the Atmel AVR atmegaXX8PA
 
 LICENCE
 =============
