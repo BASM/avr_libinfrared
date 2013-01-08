@@ -15,7 +15,7 @@ protocols:
 
 Verified under the Atmel AVR atmegaXX8PA
 
-LICENCE
+LICENSE
 =============
 Copyright (C) 2013 Leonid Myravjev (asm@asm.pp.ru)
 
