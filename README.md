@@ -5,11 +5,11 @@ Library is designed to transmit and receive infrared data.
 Supported protocols: NEC, Panasoinc and own protocol for sending and receiving data.
 
 Status of implementation:
-* Receive (no)
+* Receive (yes)
 * Transmission (no)
 
 protocols:
-* NEC (no)
+* NEC (yes)
 * Panasonic (no)
 * Own (no)
 
