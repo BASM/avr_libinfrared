@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <ir.h>
 
+
 int hexdump(unsigned char* buff, int size)
 {
   int i;
@@ -14,6 +15,12 @@ int hexdump(unsigned char* buff, int size)
   printf("\n");
   return 0;
 }
+
+int ir_dumpresult(char* array, int size){
+  printf("BYTES DECODE: %i:\n", size);
+  hexdump(array, size);
+}
+
 
 
 int ir_event_package(char* package, int size)
@@ -37,11 +44,11 @@ static void send_nec_head(ir_event *ev)
   ev->time+=50000; // Drop previes package
   ev->stat=1;
 
-  parce_event(ev);
+  ir_set_event(ev);
   ev->time+=9000; // start
   ev->stat=0;
 
-  parce_event(ev);
+  ir_set_event(ev);
   ev->time+=4400; // wait after start
   ev->stat=0;
 }
@@ -49,10 +56,10 @@ static void send_nec_head(ir_event *ev)
 static void send_nec_bite(ir_event *ev, int bite)
 {
   ev->stat=1;
-  parce_event(ev);// 1
+  ir_set_event(ev);// 1
   ev->time+=560;
   ev->stat=0;
-  parce_event(ev);// 0
+  ir_set_event(ev);// 0
 
   if(bite == 0){
     ev->time+=1120-560;
@@ -72,9 +79,9 @@ static void send_nec_byte(ir_event *ev,
 static void send_timeout(ir_event *ev)
 {
   ev->stat=0;
-  parce_event(ev);// 0
+  ir_set_event(ev);// 0
   ev->stat=0;
-  parce_event(ev);// 0
+  ir_set_event(ev);// 0
 
 }
 
@@ -95,9 +102,9 @@ static void send_nec_package()
 
 int main(void){
 
-  parse_init();
+  ir_init();
   //ir_event xx;
-  //parce_event(&xx);
+  //ir_event(&xx);
 
   printf("Test FAIL PACKAGE\n");
   send_fail_package();

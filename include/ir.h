@@ -6,7 +6,11 @@ typedef struct _S_IR_event {
   int time;
 } ir_event;
 
-int parse_init(void );
-int hexdump(unsigned char* buff, int size);
+///
+// Call it before parse usage..
+//
+int ir_init(void );
+int ir_set_event(ir_event* ev);
+int ir_dumpresult(char* array, int size);
 
 #endif /* _IR_H_ */

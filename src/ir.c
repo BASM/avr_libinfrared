@@ -4,7 +4,7 @@
 #include <ir.h>
 
 
-static int curtime=0;
+//static int curtime=0;
 
 struct {
   int start;
@@ -34,7 +34,7 @@ static void detect_reset()
   detect.head_down=0;
 }
 
-int parse_init()
+int ir_init()
 {
   detect_reset();
 }
@@ -81,15 +81,7 @@ static int parse_nec_bite(ir_event* ev, int delta)
   return 0;
 }
 
-static int parse_nec_dumpresult(){
-  int len=(nec.bites+1)/8;
-  printf("BYTES DECODE: %i:\n", len);
-  hexdump(nec.byte, len);
-  parse_nec_init();
-}
-
-
-int parce_event(ir_event* ev)
+int ir_set_event(ir_event* ev)
 {
   static int oldtime=0;
   static int oldstat=0;
@@ -99,7 +91,8 @@ int parce_event(ir_event* ev)
 
     switch(detect.parsetype){
       case PROTO_NEC:
-        parse_nec_dumpresult();
+        ir_dumpresult(nec.byte, (nec.bites+1)/8);
+        parse_nec_init();
         break;
     }
     detect_reset();
