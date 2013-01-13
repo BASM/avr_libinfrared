@@ -41,15 +41,15 @@ static void send_fail_package()
 
 static void send_nec_head(ir_event *ev)
 {
-  ev->time+=50000; // Drop previes package
+  ev->time=500000; // Drop previes package
   ev->stat=1;
 
   ir_set_event(ev);
-  ev->time+=9000; // start
+  ev->time=9000; // start
   ev->stat=0;
 
   ir_set_event(ev);
-  ev->time+=4400; // wait after start
+  ev->time=4400; // wait after start
   ev->stat=0;
 }
 
@@ -57,14 +57,14 @@ static void send_nec_bite(ir_event *ev, int bite)
 {
   ev->stat=1;
   ir_set_event(ev);// 1
-  ev->time+=560;
+  ev->time=560;
   ev->stat=0;
   ir_set_event(ev);// 0
 
   if(bite == 0){
-    ev->time+=1120-560;
+    ev->time=1120-560;
   }else{
-    ev->time+=2240-560;
+    ev->time=2240-560;
   }
 }
 

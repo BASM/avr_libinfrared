@@ -83,7 +83,6 @@ static int parse_nec_bite(ir_event* ev, int delta)
 
 int ir_set_event(ir_event* ev)
 {
-  static int oldtime=0;
   static int oldstat=0;
 
   if (ev->stat == oldstat){
@@ -99,15 +98,11 @@ int ir_set_event(ir_event* ev)
   }
   oldstat=ev->stat;
 
-  if (ev->time < oldtime){
-    //DROP PACKAGE
-    printf("PARSE init \n");
+  int delta = ev->time;
+  if (delta>9000*10){
+    printf("START PACKAGE\n");
     detect_reset();
-    return 0;
   }
-
-  int delta = ev->time-oldtime;
-  oldtime=ev->time;
   //printf("Event: %i, %i, delta: %i\n", ev->stat, ev->time, delta);
 
   if (detect.parsetype==PROTO_DETECT) {
