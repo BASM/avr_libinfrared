@@ -57,24 +57,24 @@ static int parse_nec_init(){
 static int parse_nec_bite(ir_event* ev, int delta)
 {
   if(ev->stat==0){
-    if(in_range(delta, 560, 50)){
+    if(in_range(delta, 560, 310)){
       nec.start=1;
     }else{
-      printf("BROKEN PACKAGE\n");
+      printf("BROKEN PACKAGE: %i\n", delta);
       return -1;
     }
   }else{
-    if (in_range(delta, 1120-560, 50)){
+    if (in_range(delta, 1120-560, 310)){
       nec.bites++;
     }else{
-      if (in_range(delta, 2240-560, 50)){
+      if (in_range(delta, 2240-560, 310)){
         int byte=nec.bites/8;
         int bite=nec.bites%8;
         nec.byte[byte]|=1<<bite;
         //printf("BYTE: %i, BITE: %i, CHR: %x\n", byte, bite, nec.byte[byte]);
         nec.bites++;
       }else{
-        printf("BROKEN PACKAGE2\n");
+        printf("BROKEN PACKAGE2: %i (btes: %i)\n", delta, nec.bites);
       }
     }
   }
@@ -86,22 +86,28 @@ int ir_set_event(ir_event* ev)
   static int oldstat=0;
 
   if (ev->stat == oldstat){
-    printf("TIME OUT\n");
+    //printf("TIME OUT\n");
 
     switch(detect.parsetype){
       case PROTO_NEC:
         ir_dumpresult(nec.byte, (nec.bites+1)/8);
-        parse_nec_init();
         break;
     }
     detect_reset();
+    return 1;
   }
   oldstat=ev->stat;
 
-  int delta = ev->time;
-  if (delta>9000*10){
-    printf("START PACKAGE\n");
+  uint32_t delta = ev->time;
+  //printf("delta: %i\n", delta);
+  if (delta>(9000*2)){
+    //printf("START PACKAGE: %i\n", delta);
+
+    if(detect.parsetype==PROTO_NEC){
+        ir_dumpresult(nec.byte, (nec.bites+1)/8);
+    }
     detect_reset();
+    return 1;
   }
   //printf("Event: %i, %i, delta: %i\n", ev->stat, ev->time, delta);
 
@@ -123,7 +129,7 @@ int ir_set_event(ir_event* ev)
           }else{
             printf("HEADER tail parse error\n");
             detect_reset();
-            return 0;
+            return 1;
           }
         }else{
           if (detect.head_up==0){
@@ -132,21 +138,27 @@ int ir_set_event(ir_event* ev)
           }else{
             printf("HEADER tailtail parse error\n");
             detect_reset();
-            return 0;
+            return 1;
           }
         }
 
       }
     }while(0);
-    if (in_range(detect.head_up, 9000, 100) )
-      if (in_range(detect.head_down, 4400, 100) ){
-        detect.parsetype=PROTO_NEC;
-        printf("FINDED NEC PROTOCOL\n");
+    if ( in_range(detect.head_up, 9000, 300) &&
+         in_range(detect.head_down, 4400, 300)) {
+         detect.parsetype=PROTO_NEC;
+         parse_nec_init();
+         return 0;
+      }else{
+        printf("UNKNONW HEAD: up: %i, down: %i\n\r", detect.head_up, detect.head_down);
+        detect_reset();
+        return 1;
       }
   }
 
   if(detect.parsetype==PROTO_NEC){
-    parse_nec_bite(ev, delta);
+    if(parse_nec_bite(ev, delta)<0)
+      detect_reset();
   }
 
 

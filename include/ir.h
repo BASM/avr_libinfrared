@@ -3,7 +3,7 @@
 
 typedef struct _S_IR_event {
   int stat;
-  int time;
+  uint32_t time;
 } ir_event;
 
 ///
