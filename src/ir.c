@@ -15,6 +15,7 @@ struct {
 enum {
   PROTO_DETECT,
   PROTO_NEC,
+  PROTO_NECHEAD,
   PROTO_PANASONIC,
 };
 
@@ -57,17 +58,17 @@ static int parse_nec_init(){
 static int parse_nec_bite(ir_event* ev, int delta)
 {
   if(ev->stat==0){
-    if(in_range(delta, 560, 310)){
+    if(in_range(delta, 560, 558)){
       nec.start=1;
     }else{
       printf("BROKEN PACKAGE: %i\n", delta);
       return -1;
     }
   }else{
-    if (in_range(delta, 1120-560, 310)){
+    if (in_range(delta, 1120-560, 558)){
       nec.bites++;
     }else{
-      if (in_range(delta, 2240-560, 310)){
+      if (in_range(delta, 2240-560, 558)){
         int byte=nec.bites/8;
         int bite=nec.bites%8;
         nec.byte[byte]|=1<<bite;
@@ -150,8 +151,14 @@ int ir_set_event(ir_event* ev)
          parse_nec_init();
          return 0;
       }else{
-        printf("UNKNONW HEAD: up: %i, down: %i\n\r", detect.head_up, detect.head_down);
-        detect_reset();
+        if( in_range(detect.head_up, 9000, 500) &&
+            in_range(detect.head_down, 2250, 500)){
+            detect.parsetype=PROTO_NECHEAD;
+            parse_nec_init();
+        }else{
+          printf("UNKNONW HEAD: up: %i, down: %i\n\r", detect.head_up, detect.head_down);
+          detect_reset();
+        }
         return 1;
       }
   }
@@ -159,6 +166,11 @@ int ir_set_event(ir_event* ev)
   if(detect.parsetype==PROTO_NEC){
     if(parse_nec_bite(ev, delta)<0)
       detect_reset();
+  }
+  if(detect.parsetype==PROTO_NECHEAD){
+    if(in_range(delta, 562, 100)){
+        ir_dumpresult(0, 0);//RET
+    }
   }
 
 
