@@ -1,4 +1,7 @@
-#include <stdio.h>
+//#include <stdio.h>
+#define printf(...) {}
+
+
 #include <inttypes.h>
 #include <string.h>
 #include <ir.h>
