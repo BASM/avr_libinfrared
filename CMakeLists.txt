@@ -11,6 +11,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ggdb3")
 
 add_library(ir STATIC src/ir.c)
 
-add_executable(main test/main.c)
-target_link_libraries(main ir)
+#add_executable(main test/main.c)
+#target_link_libraries(main ir)
 
